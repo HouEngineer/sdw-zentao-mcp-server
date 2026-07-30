@@ -1,36 +1,12 @@
 # zentao
 
-禅道 (Zentao) 通用 MCP Server，支持需求/Bug/任务/用例/项目/产品等全部读写操作。
+禅道 (Zentao) MCP Server，通过 `mcp__zentao__*` 系列工具供 Agent 操作禅道数据，覆盖需求/Bug/任务/用例/项目/产品/执行/版本/反馈/工单/用户等全部 CRUD。
 
-## 安装
+## 认证
 
-```bash
-cd ~/.cc-switch/mcp-servers/zentao
-npm install
-```
-
-## 在 Claude Code 中注册
-
-编辑 `~/.claude/mcp.json`，添加：
-
-```json
-{
-  "mcpServers": {
-    "zentao": {
-      "command": "node",
-      "args": ["/Users/pengxu.hou/.cc-switch/mcp-servers/zentao/src/index.js"]
-    }
-  }
-}
-```
-
-凭据（`ZENTAO_BASE_URL` / `ZENTAO_ACCOUNT` / `ZENTAO_PASSWORD`）从环境变量自动读取，无需在 `mcp.json` 中声明。
-
-## 认证方式
-
-优先使用 `ZENTAO_TOKEN`；如果未设置，则用 `ZENTAO_ACCOUNT` + `ZENTAO_PASSWORD` 自动登录获取 Token。
-
-环境变量在 `shared/env/common.env` 中配置，由 zsh profile 链自动加载。
+- 优先使用环境变量 `ZENTAO_TOKEN`（API Token）
+- 无 Token 时用 `ZENTAO_ACCOUNT` + `ZENTAO_PASSWORD` 自动登录
+- 需设置 `ZENTAO_BASE_URL`（禅道根地址，如 `http://172.20.20.211:8099`）
 
 ## 工具清单
 
@@ -74,7 +50,7 @@ npm install
 | | `zentao_create_project` | 创建项目 |
 | | `zentao_update_project` | 修改项目 |
 | | `zentao_delete_project` | 删除项目 |
-| 执行 | `zentao_list_executions` | 获取执行列表 |
+| 执行/迭代 | `zentao_list_executions` | 获取执行列表 |
 | | `zentao_get_execution` | 获取执行详情 |
 | | `zentao_create_execution` | 创建执行/迭代 |
 | | `zentao_update_execution` | 修改执行 |
@@ -113,17 +89,8 @@ npm install
 | | `zentao_update_ticket` | 修改工单 |
 | | `zentao_delete_ticket` | 删除工单 |
 
-## 本地测试
+## 行为特性
 
-```bash
-cd ~/.cc-switch/mcp-servers/zentao
-# 需确保 ZENTAO_BASE_URL / ZENTAO_ACCOUNT / ZENTAO_PASSWORD 已在环境中
-node src/index.js
-```
-
-启动后通过 stdio 收发 MCP 协议消息。验证日志会打到 stderr。
-
-## 注意
-
-- 仅支持禅道 v18+ REST API
-- 错误会以 `isError: true` 的形式返回，文本里包含具体原因
+- **自动重登录**：Token 过期（401）时自动用账号密码重新登录并重试，对调用方透明。
+- **错误返回**：失败时以 `isError: true` 返回，文本包含具体原因。
+- **禅道版本**：仅支持 v18+ REST API。
