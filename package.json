@@ -1,6 +1,6 @@
 {
   "name": "@houengineer/zentao-mcp-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "禅道 (Zentao) MCP Server — 需求/Bug/任务/用例等读写",
   "type": "module",
   "main": "src/index.js",
