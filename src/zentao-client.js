@@ -99,8 +99,8 @@ export class ZentaoClient {
     return await this.login();
   }
 
-  /** 通用请求 — 使用 Cookie zentaosid 认证 */
-  async request(method, path, { query, body } = {}) {
+  /** 通用请求 — 使用 Cookie zentaosid 认证，401 时自动重登录 */
+  async request(method, path, { query, body } = {}, isRetry = false) {
     await this.ensureToken();
     let url = this.url(path);
     if (query) {
@@ -121,6 +121,13 @@ export class ZentaoClient {
       headers['Content-Length'] = Buffer.byteLength(reqBody);
     }
     const { status, text } = await rawRequest(method, url, headers, reqBody);
+
+    // 401 时清空 token 重试一次（自动重登录）
+    if (status === 401 && !isRetry) {
+      this.token = null;
+      return this.request(method, path, { query, body }, true);
+    }
+
     let json;
     try {
       json = text ? JSON.parse(text) : null;
